@@ -515,11 +515,18 @@ function generateFaviconLinks(basePath = '') {
         if (fs.existsSync(jpgPath)) {
           faviconLinks += `  <link rel="icon" type="image/jpeg" href="favicon.jpg">\n`;
         }
+      } else {
+        // For subdirectories, also link to root favicon
+        faviconLinks += `  <link rel="icon" type="image/png" href="/favicon.png">\n`;
       }
     } else if (foundFormat === 'svg') {
       faviconLinks += `  <link rel="icon" type="image/svg+xml" href="${faviconUrl}">\n`;
+      // Always add root-level favicon link (for subdirectories, use absolute path)
       if (basePath === '') {
         faviconLinks += `  <link rel="icon" type="image/svg+xml" href="${rootFaviconUrl}">\n`;
+      } else {
+        // For subdirectories, link to root favicon using absolute path
+        faviconLinks += `  <link rel="icon" type="image/svg+xml" href="/favicon.svg">\n`;
       }
     }
   }
