@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Micro / Macro Poster - Portfolio</title>
+  <link rel="stylesheet" href="../../style.css">
+  <style>
+    /* Carousel Styles */
+    .carousel-container {
+      position: relative;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+    
+    .carousel-wrapper {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    }
+    
+    .carousel-track {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+      will-change: transform;
+      width: 100%;
+    }
+    
+    .carousel-slide {
+      width: 100%;
+      min-width: 100%;
+      max-width: 100%;
+      flex-shrink: 0;
+      flex-grow: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: calc(100vh - 200px);
+      min-height: 500px;
+      box-sizing: border-box;
+    }
+    
+    .carousel-slide img {
+      height: 100%;
+      width: auto;
+      max-width: 100%;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      cursor: pointer;
+      margin: 0 auto;
+    }
+    
+    .carousel-pdf {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: none;
+    }
+    
+    .carousel-vimeo {
+      width: 100%;
+      height: 100%;
+      display: block;
+      padding: 10px;
+      box-sizing: border-box;
+      border: none;
+    }
+    
+    .carousel-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    
+    .carousel-arrow {
+      background-color: #F0F0F0;
+      border: 3px outset #CCCCCC;
+      font-size: 28pt;
+      font-weight: bold;
+      width: 70px;
+      height: 50px;
+      cursor: pointer;
+      color: #000080;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .carousel-arrow:hover {
+      background-color: #E0E0E0;
+      border: 3px inset #CCCCCC;
+      color: #FF0000;
+    }
+    
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 0;
+    }
+    
+    .carousel-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: #CCCCCC;
+      border: 2px outset #CCCCCC;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .carousel-dot:hover {
+      background-color: #999999;
+    }
+    
+    .carousel-dot.active {
+      background-color: #000080;
+      border: 2px inset #CCCCCC;
+    }
+  </style>
+  <script>
+    const allMedia = [{"type":"image","src":"images/poster.webp"}];
+    const carouselItems = [{"type":"image","src":"images/poster.webp","alt":"Micro / Macro Poster"}];
+    let currentCarouselIndex = 0;
+    
+    function updateCarousel() {
+      const track = document.querySelector('.carousel-track');
+      const dots = document.querySelectorAll('.carousel-dot');
+      const totalSlides = carouselItems.length;
+      
+      if (!track || totalSlides === 0) return;
+      
+      // Update track position - ensure full 100% translation per slide
+      const translateX = currentCarouselIndex * 100;
+      track.style.transform = `translateX(-${translateX}%)`;
+      
+      // Update dots
+      dots.forEach((dot, index) => {
+        if (index === currentCarouselIndex) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+    }
+    
+    function carouselNext() {
+      if (carouselItems.length === 0) return;
+      currentCarouselIndex = (currentCarouselIndex + 1) % carouselItems.length;
+      updateCarousel();
+    }
+    
+    function carouselPrev() {
+      if (carouselItems.length === 0) return;
+      currentCarouselIndex = (currentCarouselIndex - 1 + carouselItems.length) % carouselItems.length;
+      updateCarousel();
+    }
+    
+    function carouselGoTo(index) {
+      if (index >= 0 && index < carouselItems.length) {
+        currentCarouselIndex = index;
+        updateCarousel();
+      }
+    }
+    
+    // Keyboard navigation for carousel
+    document.addEventListener('keydown', function(e) {
+      const popup = document.getElementById('image-popup');
+      if (popup && popup.style.display === 'block') {
+        // If popup is open, handle popup navigation
+        if (e.key === 'Escape') closePopup();
+        if (e.key === 'ArrowRight') nextImage();
+        if (e.key === 'ArrowLeft') prevImage();
+      } else {
+        // Otherwise, handle carousel navigation
+        if (e.key === 'ArrowLeft') carouselPrev();
+        if (e.key === 'ArrowRight') carouselNext();
+      }
+    });
+    
+    function openImagePopup(src, index) {
+      const popup = document.getElementById('image-popup');
+      const popupContent = document.getElementById('popup-content');
+      const popupImg = document.getElementById('popup-image');
+      const popupPdf = document.getElementById('popup-pdf');
+      const prevBtn = document.getElementById('popup-prev');
+      const nextBtn = document.getElementById('popup-next');
+      const closeBtn = document.getElementById('popup-close');
+      
+      currentIndex = index;
+      updatePopup();
+      popup.style.display = 'block';
+    }
+    
+    let currentIndex = 0;
+    
+    function updatePopup() {
+      const media = allMedia[currentIndex];
+      const popupImg = document.getElementById('popup-image');
+      const popupPdf = document.getElementById('popup-pdf');
+      const popupVimeo = document.getElementById('popup-vimeo');
+      const prevBtn = document.getElementById('popup-prev');
+      const nextBtn = document.getElementById('popup-next');
+      
+      // Hide all media types first
+      popupImg.style.display = 'none';
+      popupPdf.style.display = 'none';
+      popupVimeo.style.display = 'none';
+      
+      if (media.type === 'image') {
+        popupImg.src = media.src;
+        popupImg.style.display = 'block';
+      } else if (media.type === 'pdf') {
+        popupPdf.src = media.src;
+        popupPdf.style.display = 'block';
+      } else if (media.type === 'vimeo') {
+        popupVimeo.src = media.src;
+        popupVimeo.style.display = 'block';
+      }
+      
+      prevBtn.style.display = currentIndex > 0 ? 'block' : 'none';
+      nextBtn.style.display = currentIndex < allMedia.length - 1 ? 'block' : 'none';
+    }
+    
+    function closePopup() {
+      document.getElementById('image-popup').style.display = 'none';
+    }
+    
+    function nextImage() {
+      if (currentIndex < allMedia.length - 1) {
+        currentIndex++;
+        updatePopup();
+      }
+    }
+    
+    function prevImage() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updatePopup();
+      }
+    }
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+      const popup = document.getElementById('image-popup');
+      if (popup.style.display === 'block') {
+        if (e.key === 'Escape') closePopup();
+        if (e.key === 'ArrowRight') nextImage();
+        if (e.key === 'ArrowLeft') prevImage();
+      }
+    });
+  </script>
+</head>
+<body>
+  <div class="page-container project-page">
+    <nav>
+      <a href="../index.html">← Back to Poster</a>
+    </nav>
+    
+    <main class="project">
+      <header>
+        <h1>Micro / Macro Poster</h1>
+        <div class="meta">
+          <span class="type">poster</span>
+          <span class="date">2024</span>
+          <span class="materials">Indesign</span>
+        </div>
+      </header>
+      
+      <div class="gallery">
+                <div class="carousel-slide" data-index="0">
+          <img src="images/poster.webp" alt="Micro / Macro Poster" onclick="openImagePopup('images/poster.webp', 0)" loading="lazy">
+        </div>
+      </div>
+      
+      <div class="statement">
+        <p>An adaptation of Edward Tufte&#39;s article on information design.</p>
+
+      </div>
+    </main>
+  </div>
+  
+  <!-- Image Popup -->
+  <div id="image-popup" class="image-popup" onclick="if(event.target.id === 'image-popup') closePopup()">
+    <div class="popup-content">
+      <button id="popup-close" class="popup-close" onclick="closePopup()">✕</button>
+      <button id="popup-prev" class="popup-nav popup-prev" onclick="prevImage()">‹</button>
+      <button id="popup-next" class="popup-nav popup-next" onclick="nextImage()">›</button>
+      <img id="popup-image" class="popup-media" alt="Enlarged view">
+      <iframe id="popup-pdf" class="popup-media popup-pdf" style="display:none;"></iframe>
+      <iframe id="popup-vimeo" class="popup-media popup-vimeo" style="display:none;" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Old build output (we use output/ now)
+dist/
+
+# Note: We're tracking output/ folder for GitHub Pages deployment
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.log
+*.tmp
+

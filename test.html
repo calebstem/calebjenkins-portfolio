@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Test Page - Edit Me!</title>
+  <style>
+    /* ============================================
+       TEST PAGE - Edit CSS here, then copy back to build.js
+       ============================================ */
+    
+    body {
+      font-family: "Times New Roman", Times, serif; /* DESIGN_CONFIG.fonts.body */
+      font-size: 12pt; /* DESIGN_CONFIG.fontSize.body */
+      line-height: 1.4;
+      color: #000000; /* DESIGN_CONFIG.colors.text */
+      background-color: #FFFFFF; /* DESIGN_CONFIG.colors.bg */
+      margin: 20px auto;
+      max-width: 800px;
+      padding: 0 20px;
+    }
+
+    /* Homepage container - centered */
+    body:has(.homepage-container) {
+      background-color: #000000; /* DESIGN_CONFIG.colors.homepageBg */
+      margin: auto;
+      padding: 20px;
+    }
+
+    .homepage-container {
+      width: 50vw; /* DESIGN_CONFIG.homepageWidth */
+      margin: 0 auto;
+      text-align: center;
+      background-color: #FFFFFF; /* DESIGN_CONFIG.homepageBg */
+      border: 4px outset #CCCCCC; /* DESIGN_CONFIG.homepageBorder */
+      padding: 30px; /* DESIGN_CONFIG.homepagePadding */
+    }
+
+    /* Header with skeletons */
+    .header-with-skeletons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px; /* DESIGN_CONFIG.skeletonGap */
+      margin: 30px 0;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    /* ASCII Art / GIFs */
+    .skeleton-art {
+      border: 2px inset #666666; /* DESIGN_CONFIG.skeletonBorder */
+      padding: 10px; /* DESIGN_CONFIG.skeletonPadding */
+      background-color: #000000; /* DESIGN_CONFIG.colors.skeletonBg */
+      width: 150px; /* DESIGN_CONFIG.skeletonWidth */
+      height: auto;
+      flex-shrink: 0;
+    }
+
+    .skeleton-right {
+      transform: scaleX(-1);
+    }
+
+    .flame-art {
+      margin: 20px auto;
+      display: block;
+      border: 2px inset #FF3300; /* DESIGN_CONFIG.colors.flameBorder */
+      padding: 10px;
+      background-color: #000000; /* DESIGN_CONFIG.colors.flameBg */
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Links - classic web 1.0 style */
+    a:link {
+      color: #0000FF; /* DESIGN_CONFIG.colors.link */
+      text-decoration: underline;
+    }
+
+    a:visited {
+      color: #800080; /* DESIGN_CONFIG.colors.linkVisited */
+      text-decoration: underline;
+    }
+
+    a:hover {
+      color: #FF0000; /* DESIGN_CONFIG.colors.linkHover */
+      text-decoration: underline;
+      font-weight: bold;
+    }
+
+    a:active {
+      color: #FF0000; /* DESIGN_CONFIG.colors.linkHover */
+      text-decoration: underline;
+    }
+
+    /* Header */
+    .site-header {
+      border: 4px outset #CCCCCC; /* DESIGN_CONFIG.colors.headerBorder */
+      background-color: #F0F0F0; /* DESIGN_CONFIG.colors.headerBg */
+      padding: 10px 20px;
+      flex: 1;
+      min-width: 150px;
+      max-width: 100%;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .site-header h1 {
+      font-size: clamp(14pt, 5vw, 48pt); /* DESIGN_CONFIG.fontSize.headerH1 - scales with viewport */
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #000080; /* DESIGN_CONFIG.colors.headerText */
+      text-shadow: 1px 1px 0px #CCCCCC; /* DESIGN_CONFIG.colors.headerBorder */
+      word-wrap: break-word;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .flame-text {
+      font-size: clamp(8pt, 2.5vw, 24pt); /* DESIGN_CONFIG.fontSize.headerSubtitle - scales with viewport */
+      color: #FF3300; /* DESIGN_CONFIG.colors.flameText */
+      font-weight: bold;
+      margin: 0;
+      word-wrap: break-word;
+      text-align: center;
+    }
+
+    /* Type Navigation */
+    .type-nav {
+      margin: 30px 0;
+      width: 100%;
+    }
+
+    .type-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .type-list li {
+      margin: 15px 0;
+      border: 3px outset #CCCCCC;
+      background-color: #F0F0F0;
+      padding: 15px;
+      display: block;
+    }
+
+    .type-list li:hover {
+      border: 3px inset #CCCCCC;
+      background-color: #E0E0E0;
+    }
+
+    .type-list a {
+      font-size: 18pt; /* DESIGN_CONFIG.fontSize.typeLinks */
+      font-weight: bold;
+      text-decoration: none;
+      color: #000080; /* DESIGN_CONFIG.colors.headerText */
+      display: block;
+    }
+
+    .type-list a:hover {
+      color: #FF0000; /* DESIGN_CONFIG.colors.linkHover */
+      text-decoration: underline;
+    }
+
+    /* Navigation */
+    nav {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 2px inset #CCCCCC;
+      background-color: #F5F5F5;
+      text-align: center;
+    }
+
+    nav a {
+      font-weight: bold;
+    }
+
+    /* Horizontal rule */
+    hr {
+      border: none;
+      border-top: 2px solid #000000;
+      margin: 20px 0;
+    }
+
+    /* Type sections */
+    .type-section {
+      margin-bottom: 40px;
+      border: 2px outset #CCCCCC;
+      padding: 15px;
+      background-color: #FAFAFA;
+    }
+
+    .type-section h2 {
+      font-size: 18pt; /* DESIGN_CONFIG.fontSize.typeSection */
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-transform: capitalize;
+      color: #000080; /* DESIGN_CONFIG.colors.headerText */
+      border-bottom: 2px solid #000000; /* DESIGN_CONFIG.colors.text */
+      padding-bottom: 5px;
+    }
+
+    /* Project grid - using table-like layout */
+    .project-grid {
+      display: block;
+    }
+
+    .project-card {
+      display: block;
+      margin-bottom: 20px;
+      border: 2px inset #CCCCCC;
+      padding: 10px;
+      background-color: #FFFFFF;
+    }
+
+    .project-card a {
+      text-decoration: none;
+      color: #000000;
+    }
+
+    .project-card img {
+      width: 100%;
+      border: 2px inset #CCCCCC;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .project-card h3 {
+      font-size: 14pt; /* DESIGN_CONFIG.fontSize.projectCard */
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #000080; /* DESIGN_CONFIG.colors.headerText */
+    }
+
+    .project-card h3 a {
+      color: #000080; /* DESIGN_CONFIG.colors.headerText */
+    }
+
+    .project-card .date {
+      color: #666666;
+      font-size: 10pt;
+      font-style: italic;
+    }
+
+    /* Project page */
+    .project header {
+      margin-bottom: 20px;
+      border: 3px outset #CCCCCC;
+      background-color: #F0F0F0;
+      padding: 15px;
+    }
+
+    .project h1 {
+      font-size: 20pt; /* DESIGN_CONFIG.fontSize.projectTitle */
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #000080; /* DESIGN_CONFIG.colors.headerText */
+    }
+
+    .meta {
+      display: block;
+      margin-top: 10px;
+      font-size: 11pt;
+    }
+
+    .meta span {
+      display: inline-block;
+      margin-right: 15px;
+      padding: 3px 8px;
+      border: 1px inset #CCCCCC;
+      background-color: #FFFFFF;
+    }
+
+    .meta .type {
+      text-transform: capitalize;
+      font-weight: bold;
+      color: #000000;
+      background-color: #E0E0E0;
+    }
+
+    .gallery {
+      margin-bottom: 30px;
+    }
+
+    .gallery img {
+      width: 100%;
+      border: 2px inset #CCCCCC;
+      margin-bottom: 15px;
+      display: block;
+    }
+
+    .statement {
+      border: 2px inset #CCCCCC;
+      padding: 15px;
+      background-color: #FAFAFA;
+      line-height: 1.6;
+    }
+
+    .statement p {
+      margin-bottom: 12px;
+      text-align: justify;
+    }
+
+    .statement h1, .statement h2, .statement h3 {
+      color: #000080; /* DESIGN_CONFIG.colors.headerText */
+      margin-top: 15px;
+      margin-bottom: 10px;
+    }
+
+    .statement strong {
+      font-weight: bold;
+    }
+
+    .statement em {
+      font-style: italic;
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      /* Hide skeletons and flame on mobile */
+      .skeleton-art,
+      .flame-art {
+        display: none;
+      }
+
+      /* Make header full width on mobile */
+      .header-with-skeletons {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .site-header {
+        width: 100%;
+        min-width: unset;
+      }
+
+      /* Adjust homepage container for mobile */
+      .homepage-container {
+        width: 95vw;
+        padding: 15px;
+      }
+
+      /* Make type links more touch-friendly */
+      .type-list li {
+        padding: 20px;
+        margin: 10px 0;
+      }
+
+      .type-list a {
+        font-size: 16pt;
+      }
+
+      /* Adjust text sizes for mobile */
+      .site-header h1 {
+        font-size: clamp(18pt, 8vw, 32pt);
+      }
+
+      .flame-text {
+        font-size: clamp(10pt, 4vw, 18pt);
+      }
+    }
+
+    @media (max-width: 480px) {
+      /* Extra small screens */
+      .homepage-container {
+        width: 100vw;
+        padding: 10px;
+        border: none;
+      }
+
+      body:has(.homepage-container) {
+        padding: 0;
+      }
+
+      .site-header {
+        padding: 8px 15px;
+      }
+
+      .type-list a {
+        font-size: 14pt;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="homepage-container">
+    <div class="header-with-skeletons">
+      <!-- Skeleton Left - Add skeleton.gif to assets/ folder to see it -->
+      <img src="assets/skeleton.gif" alt="Skeleton" class="skeleton-art skeleton-left" onerror="this.style.display='none'">
+      
+      <header class="site-header">
+        <h1>Caleb Jenkins</h1>
+        <p class="flame-text">🔥 BADASS CREATIONS 🔥</p>
+      </header>
+      
+      <!-- Skeleton Right (mirrored) -->
+      <img src="assets/skeleton.gif" alt="Skeleton" class="skeleton-art skeleton-right" onerror="this.style.display='none'">
+    </div>
+    
+    <nav class="type-nav">
+      <ul class="type-list">
+        <li><a href="digital/">DIGITAL</a></li>
+        <li><a href="photo-video/">PHOTO-VIDEO</a></li>
+        <li><a href="print/">PRINT</a></li>
+        <li><a href="sculpture/">SCULPTURE</a></li>
+      </ul>
+    </nav>
+    
+    <!-- Flame - Add flame.gif to assets/ folder to see it -->
+    <img src="assets/flame.gif" alt="Flame" class="flame-art" onerror="this.style.display='none'">
+  </div>
+</body>
+</html>
+
