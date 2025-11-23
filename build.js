@@ -1076,6 +1076,22 @@ function generateAboutPage() {
   fs.writeFileSync(path.join(OUTPUT_DIR, 'about.html'), html);
 }
 
+// Generate CNAME file for custom domain
+function generateCNAME() {
+  const cnamePath = path.join(OUTPUT_DIR, 'CNAME');
+  const cnameSourcePath = './CNAME';
+  
+  // If CNAME exists in root, copy it; otherwise create empty placeholder
+  if (fs.existsSync(cnameSourcePath)) {
+    fs.copyFileSync(cnameSourcePath, cnamePath);
+    console.log('  ✓ Copied CNAME file');
+  } else {
+    // Create empty CNAME file (user can add domain later)
+    fs.writeFileSync(cnamePath, '');
+    console.log('  ✓ Created CNAME file (add your domain to ./CNAME in project root)');
+  }
+}
+
 // Generate basic CSS
 function generateCSS() {
   const c = DESIGN_CONFIG;
@@ -1764,6 +1780,9 @@ async function build() {
   
   // Generate CSS
   generateCSS();
+  
+  // Generate CNAME file for custom domain (if configured)
+  generateCNAME();
   
   console.log('\n✨ Build complete! Check the output/ folder\n');
 }
