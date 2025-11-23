@@ -472,7 +472,8 @@ async function downloadYouTubeThumbnail(videoId, destPath) {
 
 // Generate favicon HTML links
 function generateFaviconLinks(basePath = '') {
-  const faviconFormats = ['favicon.ico', 'favicon.png', 'favicon.svg'];
+  // Prioritize SVG (usually transparent) over PNG, then ICO
+  const faviconFormats = ['favicon.svg', 'favicon.png', 'favicon.ico'];
   const assetsPath = path.join(ASSETS_DIR);
   let faviconLinks = '';
   let foundFavicon = null;
@@ -504,10 +505,16 @@ function generateFaviconLinks(basePath = '') {
       faviconLinks += `  <link rel="apple-touch-icon" href="${faviconUrl}">\n`;
       if (basePath === '') {
         faviconLinks += `  <link rel="icon" type="image/png" href="${rootFaviconUrl}">\n`;
-        // Add explicit links for fallback files we create
-        faviconLinks += `  <link rel="icon" type="image/x-icon" href="favicon.ico">\n`;
-        faviconLinks += `  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">\n`;
-        faviconLinks += `  <link rel="icon" type="image/jpeg" href="favicon.jpg">\n`;
+        // Only add fallback links if fallback files exist (created when no SVG)
+        const icoPath = path.join(OUTPUT_DIR, 'favicon.ico');
+        const jpgPath = path.join(OUTPUT_DIR, 'favicon.jpg');
+        if (fs.existsSync(icoPath)) {
+          faviconLinks += `  <link rel="icon" type="image/x-icon" href="favicon.ico">\n`;
+          faviconLinks += `  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">\n`;
+        }
+        if (fs.existsSync(jpgPath)) {
+          faviconLinks += `  <link rel="icon" type="image/jpeg" href="favicon.jpg">\n`;
+        }
       }
     } else if (foundFormat === 'svg') {
       faviconLinks += `  <link rel="icon" type="image/svg+xml" href="${faviconUrl}">\n`;
@@ -537,19 +544,23 @@ function copyAssets() {
         if (asset.startsWith('favicon.')) {
           const rootFaviconPath = path.join(OUTPUT_DIR, asset);
           fs.copyFileSync(sourcePath, rootFaviconPath);
-          
-          // Create fallback favicon files for browsers that request them
-          // If we have favicon.png, also create favicon.ico and favicon.jpg
-          if (asset === 'favicon.png') {
-            const rootIcoPath = path.join(OUTPUT_DIR, 'favicon.ico');
-            const rootJpgPath = path.join(OUTPUT_DIR, 'favicon.jpg');
-            // Copy PNG as ICO and JPG (browsers will accept it)
-            fs.copyFileSync(sourcePath, rootIcoPath);
-            fs.copyFileSync(sourcePath, rootJpgPath);
-          }
         }
       }
     });
+    
+    // Only create fallback .ico and .jpg if we DON'T have SVG (to avoid white background)
+    const svgPath = path.join(ASSETS_DIR, 'favicon.svg');
+    const pngPath = path.join(ASSETS_DIR, 'favicon.png');
+    
+    // If we have SVG, don't create white background fallbacks from PNG
+    // Modern browsers will use the SVG, which is transparent
+    if (!fs.existsSync(svgPath) && fs.existsSync(pngPath)) {
+      // Only create fallbacks from PNG if no SVG exists
+      const rootIcoPath = path.join(OUTPUT_DIR, 'favicon.ico');
+      const rootJpgPath = path.join(OUTPUT_DIR, 'favicon.jpg');
+      fs.copyFileSync(pngPath, rootIcoPath);
+      fs.copyFileSync(pngPath, rootJpgPath);
+    }
   }
 }
 
