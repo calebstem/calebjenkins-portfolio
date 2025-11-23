@@ -17,16 +17,29 @@ concurrency:
 
 jobs:
   deploy:
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
+      
+      - name: Check output folder exists
+        run: |
+          if [ ! -d "output" ]; then
+            echo "Error: output folder does not exist"
+            exit 1
+          fi
+          if [ -z "$(ls -A output)" ]; then
+            echo "Error: output folder is empty"
+            exit 1
+          fi
+          echo "Output folder exists and has content"
+          ls -la output/
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
