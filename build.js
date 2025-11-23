@@ -470,7 +470,57 @@ async function downloadYouTubeThumbnail(videoId, destPath) {
   }
 }
 
-// Copy assets (GIFs, etc.) to output
+// Generate favicon HTML links
+function generateFaviconLinks(basePath = '') {
+  const faviconFormats = ['favicon.ico', 'favicon.png', 'favicon.svg'];
+  const assetsPath = path.join(ASSETS_DIR);
+  let faviconLinks = '';
+  let foundFavicon = null;
+  let foundFormat = null;
+  
+  // Check for favicon files in assets folder
+  for (const format of faviconFormats) {
+    const faviconPath = path.join(assetsPath, format);
+    if (fs.existsSync(faviconPath)) {
+      foundFavicon = format;
+      foundFormat = path.extname(format).slice(1);
+      break;
+    }
+  }
+  
+  if (foundFavicon) {
+    const faviconUrl = `${basePath}assets/${foundFavicon}`;
+    // Also provide root-level favicon for browsers that check there first
+    const rootFaviconUrl = basePath === '' ? foundFavicon : `${basePath}../${foundFavicon}`;
+    
+    if (foundFormat === 'ico') {
+      faviconLinks += `  <link rel="icon" type="image/x-icon" href="${faviconUrl}">\n`;
+      faviconLinks += `  <link rel="shortcut icon" type="image/x-icon" href="${faviconUrl}">\n`;
+      if (basePath === '') {
+        faviconLinks += `  <link rel="icon" type="image/x-icon" href="${rootFaviconUrl}">\n`;
+      }
+    } else if (foundFormat === 'png') {
+      faviconLinks += `  <link rel="icon" type="image/png" href="${faviconUrl}">\n`;
+      faviconLinks += `  <link rel="apple-touch-icon" href="${faviconUrl}">\n`;
+      if (basePath === '') {
+        faviconLinks += `  <link rel="icon" type="image/png" href="${rootFaviconUrl}">\n`;
+        // Add explicit links for fallback files we create
+        faviconLinks += `  <link rel="icon" type="image/x-icon" href="favicon.ico">\n`;
+        faviconLinks += `  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">\n`;
+        faviconLinks += `  <link rel="icon" type="image/jpeg" href="favicon.jpg">\n`;
+      }
+    } else if (foundFormat === 'svg') {
+      faviconLinks += `  <link rel="icon" type="image/svg+xml" href="${faviconUrl}">\n`;
+      if (basePath === '') {
+        faviconLinks += `  <link rel="icon" type="image/svg+xml" href="${rootFaviconUrl}">\n`;
+      }
+    }
+  }
+  
+  return faviconLinks;
+}
+
+// Copy assets (GIFs, favicons, etc.) to output
 function copyAssets() {
   const destAssets = path.join(OUTPUT_DIR, 'assets');
   fs.mkdirSync(destAssets, { recursive: true });
@@ -482,6 +532,22 @@ function copyAssets() {
       const destPath = path.join(destAssets, asset);
       if (fs.statSync(sourcePath).isFile()) {
         fs.copyFileSync(sourcePath, destPath);
+        
+        // Also copy favicon files to root for better browser compatibility
+        if (asset.startsWith('favicon.')) {
+          const rootFaviconPath = path.join(OUTPUT_DIR, asset);
+          fs.copyFileSync(sourcePath, rootFaviconPath);
+          
+          // Create fallback favicon files for browsers that request them
+          // If we have favicon.png, also create favicon.ico and favicon.jpg
+          if (asset === 'favicon.png') {
+            const rootIcoPath = path.join(OUTPUT_DIR, 'favicon.ico');
+            const rootJpgPath = path.join(OUTPUT_DIR, 'favicon.jpg');
+            // Copy PNG as ICO and JPG (browsers will accept it)
+            fs.copyFileSync(sourcePath, rootIcoPath);
+            fs.copyFileSync(sourcePath, rootJpgPath);
+          }
+        }
       }
     });
   }
@@ -587,13 +653,14 @@ function generateProjectPage(project) {
     })
   ];
   
+  const faviconLinks = generateFaviconLinks('../../');
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${project.title} - Portfolio</title>
-  <link rel="stylesheet" href="../../style.css">
+${faviconLinks}  <link rel="stylesheet" href="../../style.css">
   <style>
     /* Carousel Styles */
     .carousel-container {
@@ -848,7 +915,7 @@ function generateProjectPage(project) {
 <body>
   <div class="page-container project-page">
     <nav>
-      <a href="../index.html">← Back to ${project.type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}</a>
+      <a href="../">← Back to ${project.type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}</a>
     </nav>
     
     <main class="project">
@@ -937,13 +1004,14 @@ function generateIndexPage(projects) {
     flameArt = `    <img src="assets/${HOMEPAGE_CONFIG.flameGifName}" alt="Flame" class="flame-art">`;
   }
   
+  const faviconLinks = generateFaviconLinks();
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portfolio</title>
-  <link rel="stylesheet" href="style.css">
+  <title>${HOMEPAGE_CONFIG.title}</title>
+${faviconLinks}  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="homepage-container">
@@ -1000,7 +1068,7 @@ function generateTypeIndexPage(type, projects) {
       }
     }
     projectList += `        <article class="project-card">
-          <a href="${project.slug}/index.html">
+          <a href="${project.slug}/">
             <img src="${thumbnail}" alt="${project.title}" loading="lazy">
             <h3>${project.title}</h3>
             <p class="date">${project.date}</p>
@@ -1008,18 +1076,19 @@ function generateTypeIndexPage(type, projects) {
         </article>\n`;
   });
   
+  const faviconLinks = generateFaviconLinks('../');
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${type.toUpperCase()} - Portfolio</title>
-  <link rel="stylesheet" href="../style.css">
+${faviconLinks}  <link rel="stylesheet" href="../style.css">
 </head>
 <body>
   <div class="page-container type-page">
     <nav>
-      <a href="../index.html">← Back to Portfolio</a>
+      <a href="../">← Back to Portfolio</a>
     </nav>
     
     <main class="type-content">
@@ -1050,18 +1119,19 @@ function generateAboutPage() {
     aboutContent = marked(parsed.content);
   }
   
+  const faviconLinks = generateFaviconLinks();
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About</title>
-  <link rel="stylesheet" href="style.css">
+${faviconLinks}  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="page-container">
     <nav>
-      <a href="index.html">← Back to Home</a>
+      <a href="/">← Back to Home</a>
     </nav>
     
     <main class="project">
