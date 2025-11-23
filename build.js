@@ -490,44 +490,33 @@ function generateFaviconLinks(basePath = '') {
   }
   
   if (foundFavicon) {
-    const faviconUrl = `${basePath}assets/${foundFavicon}`;
-    // Also provide root-level favicon for browsers that check there first
-    const rootFaviconUrl = basePath === '' ? foundFavicon : `${basePath}../${foundFavicon}`;
+    // Use absolute paths for all favicon links to ensure they work from any subdirectory
+    const faviconName = foundFavicon;
     
     if (foundFormat === 'ico') {
-      faviconLinks += `  <link rel="icon" type="image/x-icon" href="${faviconUrl}">\n`;
-      faviconLinks += `  <link rel="shortcut icon" type="image/x-icon" href="${faviconUrl}">\n`;
-      if (basePath === '') {
-        faviconLinks += `  <link rel="icon" type="image/x-icon" href="${rootFaviconUrl}">\n`;
-      }
+      faviconLinks += `  <link rel="icon" type="image/x-icon" href="/assets/${faviconName}">\n`;
+      faviconLinks += `  <link rel="shortcut icon" type="image/x-icon" href="/assets/${faviconName}">\n`;
+      faviconLinks += `  <link rel="icon" type="image/x-icon" href="/${faviconName}">\n`;
     } else if (foundFormat === 'png') {
-      faviconLinks += `  <link rel="icon" type="image/png" href="${faviconUrl}">\n`;
-      faviconLinks += `  <link rel="apple-touch-icon" href="${faviconUrl}">\n`;
+      faviconLinks += `  <link rel="icon" type="image/png" href="/assets/${faviconName}">\n`;
+      faviconLinks += `  <link rel="apple-touch-icon" href="/assets/${faviconName}">\n`;
+      faviconLinks += `  <link rel="icon" type="image/png" href="/${faviconName}">\n`;
+      // Only add fallback links if fallback files exist (created when no SVG)
       if (basePath === '') {
-        faviconLinks += `  <link rel="icon" type="image/png" href="${rootFaviconUrl}">\n`;
-        // Only add fallback links if fallback files exist (created when no SVG)
         const icoPath = path.join(OUTPUT_DIR, 'favicon.ico');
         const jpgPath = path.join(OUTPUT_DIR, 'favicon.jpg');
         if (fs.existsSync(icoPath)) {
-          faviconLinks += `  <link rel="icon" type="image/x-icon" href="favicon.ico">\n`;
-          faviconLinks += `  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">\n`;
+          faviconLinks += `  <link rel="icon" type="image/x-icon" href="/favicon.ico">\n`;
+          faviconLinks += `  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">\n`;
         }
         if (fs.existsSync(jpgPath)) {
-          faviconLinks += `  <link rel="icon" type="image/jpeg" href="favicon.jpg">\n`;
+          faviconLinks += `  <link rel="icon" type="image/jpeg" href="/favicon.jpg">\n`;
         }
-      } else {
-        // For subdirectories, also link to root favicon
-        faviconLinks += `  <link rel="icon" type="image/png" href="/favicon.png">\n`;
       }
     } else if (foundFormat === 'svg') {
-      faviconLinks += `  <link rel="icon" type="image/svg+xml" href="${faviconUrl}">\n`;
-      // Always add root-level favicon link (for subdirectories, use absolute path)
-      if (basePath === '') {
-        faviconLinks += `  <link rel="icon" type="image/svg+xml" href="${rootFaviconUrl}">\n`;
-      } else {
-        // For subdirectories, link to root favicon using absolute path
-        faviconLinks += `  <link rel="icon" type="image/svg+xml" href="/favicon.svg">\n`;
-      }
+      // Use absolute paths - works from any page depth
+      faviconLinks += `  <link rel="icon" type="image/svg+xml" href="/assets/${faviconName}">\n`;
+      faviconLinks += `  <link rel="icon" type="image/svg+xml" href="/${faviconName}">\n`;
     }
   }
   
